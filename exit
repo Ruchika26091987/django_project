@@ -1,0 +1,72 @@
+[1mdiff --git a/blog/templates/blog/base.html b/blog/templates/blog/base.html[m
+[1mindex ad37ac9..45be115 100644[m
+[1m--- a/blog/templates/blog/base.html[m
+[1m+++ b/blog/templates/blog/base.html[m
+[36m@@ -47,7 +47,12 @@[m
+          <main role="main" class="container">[m
+           <div class="row">[m
+             <div class="col-md-8">[m
+[31m-              {% block content %}{% endblock %}[m
+[32m+[m[32m                {% if messages %}[m
+[32m+[m[32m                       {% for message in messages %}[m
+[32m+[m[32m                            <div class="alert alert-{{message.tags}}">{{ message }}</div>[m
+[32m+[m[32m                       {% endfor %}[m
+[32m+[m[32m                {% endif %}[m
+[32m+[m[32m                {% block content %}{% endblock %}[m
+             </div>[m
+             <div class="col-md-4">[m
+               <div class="content-section">[m
+[36m@@ -70,6 +75,6 @@[m
+     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>[m
+     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>[m
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>[m
+[31m-  <[m
+[32m+[m
+ </body>[m
+ </html>[m
+\ No newline at end of file[m
+[1mdiff --git a/db.sqlite3 b/db.sqlite3[m
+[1mindex 1a75c9c..e980dcc 100644[m
+Binary files a/db.sqlite3 and b/db.sqlite3 differ
+[1mdiff --git a/users/__pycache__/views.cpython-37.pyc b/users/__pycache__/views.cpython-37.pyc[m
+[1mindex 40da0db..21294c5 100644[m
+Binary files a/users/__pycache__/views.cpython-37.pyc and b/users/__pycache__/views.cpython-37.pyc differ
+[1mdiff --git a/users/templates/users/register.html b/users/templates/users/register.html[m
+[1mindex e28a352..2b26b43 100644[m
+[1m--- a/users/templates/users/register.html[m
+[1m+++ b/users/templates/users/register.html[m
+[36m@@ -7,7 +7,7 @@[m
+                <legend class="border-bottom mb-4">[m
+                     Join Today[m
+                </legend>[m
+[31m-               {{ form }}[m
+[32m+[m[32m               {{ form.as_p}}[m
+            </fieldset>[m
+            <div class="form-group">[m
+                <button class="btn btn-outline-info" type="submit"> Sign Up </button>[m
+[1mdiff --git a/users/views.py b/users/views.py[m
+[1mindex 5e89e5b..433d3ff 100644[m
+[1m--- a/users/views.py[m
+[1m+++ b/users/views.py[m
+[36m@@ -1,8 +1,18 @@[m
+[31m-from django.shortcuts import render[m
+[32m+[m[32mfrom django.shortcuts import render, redirect[m
+ from django.contrib.auth.forms import UserCreationForm[m
+[31m-[m
+[32m+[m[32mfrom django.contrib import messages[m
+[32m+[m[32mfrom .forms import UserRegistrationForm[m
+ # Create your views here.[m
+ [m
+ def register(request):[m
+[31m-    form = UserCreationForm()[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        form = UserRegistrationForm(request.POST)[m
+[32m+[m[32m        if form.is_valid():[m
+[32m+[m[32m            form.save()[m
+[32m+[m[32m            username = form.cleaned_data.get('username')[m
+[32m+[m[32m            messages.success(request, f'Account created for {username}!')[m
+[32m+[m[32m            return redirect('blog-home')[m
+[32m+[m
+[32m+[m[32m    else:[m
+[32m+[m[32m        form = UserCreationForm()[m
+     return render(request,'users/register.html',{'form':form})[m
